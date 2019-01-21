@@ -51,7 +51,6 @@ pinMode(LEAD_V_TRIG_PIN, INPUT_PULLUP);
 delay(10);
 Serial.println("Initialized");
 }
-
 void loop() {
   int v_voltage    = mapVoltage(analogRead(V_SENSE_PIN));
   int lead_voltage = mapVoltage(analogRead(LEAD_SENSE_PIN));
@@ -76,12 +75,15 @@ void loop() {
 
   
 
-  if(digitalRead(LEAD_V_TRIG_PIN) && (lead_voltage<500))
+  if(digitalRead(LEAD_V_TRIG_PIN) && (lead_voltage>LEAD_TRIGGER_THRESHOLD_mV))
   {
-    if((millis()-hold_time) > LEAD_TRIGGER_HOLD_mS)
+    if(((millis()-hold_time) > LEAD_TRIGGER_HOLD_mS) 
+    && ((millis()-hold_time)<4000000000) 
+    && (v_voltage >= BEEP_THRESHOLD_mV))
     {
       trigger();
-      hold_time = millis();
+      hold_time = millis()+10000;
+      Serial.println("V trigger");
     }
   }
   else
